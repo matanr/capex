@@ -9,7 +9,7 @@ By [Matan Rusanovsky](https://scholar.google.com/citations?view_op=list_works&hl
 This is the official implementation of "[CapeX: Category-Agnostic Pose Estimation from Textual Point Explanation]()".
 
 <p align="center">
-<img src="teaser.png" width="384">
+<img src="teaser.png" width="800">
 </p>
 
 ## Introduction
