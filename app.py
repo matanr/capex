@@ -246,7 +246,7 @@ with gr.Blocks() as demo:
     })
 
     gr.Markdown('''
-    # Pose Anything Demo
+    # CapeX Demo
     We present a novel category agnostic pose estimation approach that utilizes support text-graphs 
     (graphs with text on its nodes), instead of the conventional techniques that use support images.
     By leveraging the abstraction power of text-graphs, CapeX showcases SOTA results on MP100 while dropping the need 

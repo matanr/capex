@@ -33,7 +33,7 @@ RUN pip install git+https://github.com/openai/CLIP.git
 RUN pip install yapf==0.40.1
 RUN pip install transformers
 
-WORKDIR PoseAnything
+WORKDIR CapeX
 
 COPY models CapeX/models
 COPY configs CapeX/configs
@@ -47,7 +47,7 @@ COPY train.py CapeX/
 COPY README.md CapeX/
 COPY run_me.sh CapeX/
 
-RUN mkdir -p CapeX/data
+RUN mkdir -p CapeX/data/mp100
 WORKDIR CapeX
 
 # Install MMPose
@@ -56,4 +56,4 @@ ENV FORCE_CUDA="1"
 RUN python setup.py develop
 
 #CMD ["bash"]
-CMD ["/bin/bash", "-c", "chmod +x run_me.sh && ./run_me.sh"]
+#CMD ["/bin/bash", "-c", "chmod +x run_me.sh && ./run_me.sh"]
