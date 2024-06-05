@@ -6,7 +6,7 @@
 
 By [Matan Rusanovsky](https://scholar.google.com/citations?view_op=list_works&hl=en&user=5TS4vucAAAAJ), [Or Hirschorn](https://scholar.google.co.il/citations?user=GgFuT_QAAAAJ&hl=iw&oi=ao) and [Shai Avidan](https://scholar.google.co.il/citations?hl=iw&user=hpItE1QAAAAJ)
 
-This is the official implementation of "[CapeX: Category-Agnostic Pose Estimation from Textual Point Explanation]()".
+This is the official implementation of "[CapeX: Category-Agnostic Pose Estimation from Textual Point Explanation](https://arxiv.org/pdf/2406.00384)".
 
 <p align="center">
 <img src="teaser.png" width="800">
@@ -21,11 +21,11 @@ Our approach effectively breaks symmetry, preserves structure, and improves occl
 ## Citation
 If you find this useful, please cite this work as follows:
 ```bibtex
-@misc{hirschorn2023pose,
-      title={Pose Anything: A Graph-Based Approach for Category-Agnostic Pose Estimation},
-      author={Or Hirschorn and Shai Avidan},
-      year={2023},
-      eprint={2311.17891},
+@misc{rusanovsky2024capex,
+      title={CapeX: Category-Agnostic Pose Estimation from Textual Point Explanation}, 
+      author={Matan Rusanovsky and Or Hirschorn and Shai Avidan},
+      year={2024},
+      eprint={2406.00384},
       archivePrefix={arXiv},
       primaryClass={cs.CV}
 }
@@ -55,7 +55,7 @@ docker run --name capex -v {DATA_DIR}:/workspace/CapeX/CapeX/data/mp100 -it mata
 
 ## Demo on Custom Images
 
-<i>TRY IT NOW ON:</i> <a href="">HuggingFace - SOON</a>
+<i>TRY IT NOW ON:</i> <a href="">HuggingFace - Coming SOON</a>
 
 
 We provide a demo code to test our code on custom images. 
