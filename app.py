@@ -251,7 +251,7 @@ with gr.Blocks() as demo:
     (graphs with text on its nodes), instead of the conventional techniques that use support images.
     By leveraging the abstraction power of text-graphs, CapeX showcases SOTA results on MP100 while dropping the need 
     of providing an annotated support image. 
-    ### [Paper-Soon]() | [GitHub-Soon]() 
+    ### [Paper](https://arxiv.org/pdf/2406.00384) | [GitHub](https://github.com/matanr/capex) 
     ## Instructions
     1. Explain using text the desired keypoints. Pleaser refer to the example for the right format.
     2. Optionally provide a graph representing the connections between the keypoints. Pleaser refer to the example for the right format.
@@ -344,9 +344,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='CapeX Demo')
     parser.add_argument('--checkpoint',
                         help='checkpoint path',
-                        default='https://github.com/orhir/PoseAnything'
-                                '/releases/download/1.0.0/demo_b.pth')
+                        default='./swin-gte-split1.pth')
     args = parser.parse_args()
-    # checkpoint_path = args.checkpoint
-    checkpoint_path = '../PoseAnything/work-dir_freezed_gte_split1/latest.pth'
+    checkpoint_path = args.checkpoint
     demo.launch()

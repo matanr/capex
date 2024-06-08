@@ -1,0 +1,12 @@
+swin-gte-split1.pth
+__pycache__/
+work_dirs/*
+work_dir/*
+pretrained/*
+*/__pycache__
+models/models/backbones/__pycache__
+models/models/utils/__pycache__
+data/*
+data
+output/*
+.idea/*

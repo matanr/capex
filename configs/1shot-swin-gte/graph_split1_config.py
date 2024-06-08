@@ -49,6 +49,7 @@ channel_cfg = dict(
 model = dict(
     type='PoseAnythingModel',
     pretrained='pretrained/swinv2_small_1k_500k.pth',
+    # pretrained="swinv2_base",
     text_pretrained='Alibaba-NLP/gte-base-en-v1.5',
     finetune_text_pretrained=False,
     encoder_config=dict(

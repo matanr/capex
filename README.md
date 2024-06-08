@@ -2,6 +2,7 @@
 
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/capex-category-agnostic-pose-estimation-from/2d-pose-estimation-on-mp-100)](https://paperswithcode.com/sota/2d-pose-estimation-on-mp-100?p=capex-category-agnostic-pose-estimation-from)
 <a href="https://arxiv.org/pdf/2406.00384"><img src="https://img.shields.io/badge/arXiv-2311.17891-b31b1b.svg"></a>
+[![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/matanru/CapeX)
 <a href="https://www.apache.org/licenses/LICENSE-2.0.txt"><img src="https://img.shields.io/badge/License-Apache-yellow"></a>
 
 
@@ -56,10 +57,9 @@ docker run --name capex -v {DATA_DIR}:/workspace/CapeX/CapeX/data/mp100 -it mata
 
 ## Demo on Custom Images
 
-<i>TRY IT NOW ON:</i> <a href="">HuggingFace - Coming SOON</a>
+### HuggingFace Demo
+[![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/matanru/CapeX)
 
-
-We provide a demo code to test our code on custom images. 
 
 ### Gradio Demo
 Download the [pretrained model](https://drive.google.com/file/d/1hmvxTjP84YywVhhckMt1NHc3wUTqQIqp) and run:
