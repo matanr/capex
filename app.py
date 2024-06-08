@@ -45,7 +45,7 @@ def visualize_graph(node_descriptions, edges, state):
 
     # Add nodes with descriptions
     for i, desc in enumerate(node_descriptions):
-        G.add_node(i, label=desc)
+        G.add_node(i, label=f'{i}:{desc}')
 
     # Add edges
     for edge in edges:
