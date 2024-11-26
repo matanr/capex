@@ -114,6 +114,11 @@ def main():
         drop_last=False)
     dataloader_setting = dict(dataloader_setting,
                               **cfg.data.get('test_dataloader', {}))
+    # dataloader_setting = {
+    #     **dict(workers_per_gpu=cfg.data.get('workers_per_gpu', 1)),
+    #     **dict(samples_per_gpu=cfg.data.get('samples_per_gpu', 1)),
+    #     **cfg.data.get('test_dataloader', {})
+    # }
     data_loader = build_dataloader(dataset, **dataloader_setting)
 
     # build the model and load checkpoint
@@ -151,7 +156,7 @@ def main():
             print(f'{k}: {v}')
 
         # save testing log
-        test_log = "./work_dirs/testing_log.txt"
+        test_log = f"./work_dirs/test_log_{os.path.splitext(os.path.basename(args.config))[0]}.txt"
         with open(test_log, 'a') as f:
             f.write("**  config_file: " + args.config + "\t checkpoint: " + args.checkpoint + "\t \n")
             for k, v in sorted(results.items()):

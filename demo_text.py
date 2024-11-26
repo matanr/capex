@@ -19,6 +19,7 @@ import torchvision.transforms.functional as F
 from tools.visualization import plot_results, plot_query_results, plot_modified_query
 import ast
 import shutil
+import json
 
 COLORS = [
     [255, 0, 0], [255, 85, 0], [255, 170, 0], [255, 255, 0], [170, 255, 0],
@@ -78,6 +79,11 @@ def parse_args():
     parser.add_argument('--config', default=None, help='test config file path')
     parser.add_argument('--checkpoint', default=None, help='checkpoint file')
     parser.add_argument('--outdir', default='output', help='checkpoint file')
+    parser.add_argument('--load_file_with_annotations', default=None, help='ID of a file that should be loaded with annotations')
+    parser.add_argument('--index_of_annotation_of_image_id_with_annotations', default=0,
+                        help='index of the annotation requested from the image id in the annotations file, '
+                             'only used when loading a file with annotations')
+
 
     parser.add_argument(
         '--fuse-conv-bn',
@@ -123,6 +129,74 @@ def main():
     cfg.data.test.test_mode = True
 
     os.makedirs(args.outdir, exist_ok=True)
+
+    if args.load_file_with_annotations is not None:
+        same_image_id_counter = 0
+        # read json file with annotations:
+        found = False
+        for d in ['val', 'test', 'train']:
+            with open(cfg['data'][d]['ann_file'], 'r') as f:
+                annotations_file = json.load(f)
+            for image_info in annotations_file['images']:
+                if image_info['file_name'] == args.load_file_with_annotations:
+                    image_id = image_info['id']
+                    height = image_info['height']
+                    width = image_info['width']
+                    found = True
+                    break
+            if found:
+                for annotation in annotations_file['annotations']:
+                    if annotation['image_id'] == image_id:
+                        if same_image_id_counter == int(args.index_of_annotation_of_image_id_with_annotations):
+                            break
+                        else:
+                            same_image_id_counter += 1
+            if found:
+                break
+        if not found:
+            raise ValueError('Image not found in annotations file')
+        for category in annotations_file['categories']:
+            if category['id'] == annotation['category_id']:
+                skeleton = category['skeleton']
+                break
+        num_keypoints = annotation["num_keypoints"]
+        keypoints = annotation["keypoints"]
+        # Convert keypoints list to a tensor
+        keypoints_tensor = torch.tensor(keypoints, dtype=torch.float32).view(-1, 3)
+
+        # Select only the first two columns (x, y coordinates)
+        outputs = keypoints_tensor[:, :2]
+        vis_q_weight = (keypoints_tensor[:, 2] == 2).float()
+
+        # Slice to include only the number of keypoints specified
+        # outputs = result_tensor[:num_keypoints]
+        # Normalize the x-coordinates by width and y-coordinates by height
+        outputs[:, :] /= height  # Normalize by height
+
+        query = os.path.join(cfg['data_root'], 'images', args.load_file_with_annotations)
+        query_img = cv2.imread(query)
+        if query_img is None:
+            raise ValueError('Fail to read image')
+
+        preprocess = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))])
+
+        # query_img = preprocess(query_img).flip(0)[None]
+        query_img = preprocess(query_img).flip(0)[None]
+        vis_q_image = query_img[0].detach().numpy().transpose(1, 2, 0)
+        # vis_q_weight = torch.ones_like(outputs[:, 0]).view(-1,1)
+
+        # skeleton = []
+
+        name_idx = plot_query_results(vis_q_image, vis_q_weight.detach(), skeleton, torch.tensor(outputs).unsqueeze(0).detach(),
+                                      radius=6,
+                                      out_dir=args.outdir, bbox=annotation['bbox'])
+        shutil.copyfile(query, f'./{args.outdir}/{str(name_idx)}_query_in.png')
+
+        return None
+
+
 
     # Load data
     point_descriptions = ast.literal_eval(args.support_points)

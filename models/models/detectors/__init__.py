@@ -1,3 +1,3 @@
-from .pam import PoseAnythingModel
+from .capex import CapeXModel
 
-__all__ = ['PoseAnythingModel']
+__all__ = ['CapeXModel']

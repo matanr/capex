@@ -3,6 +3,7 @@ import random
 from collections import OrderedDict
 
 import numpy as np
+from fontTools.subset import subset
 from mmpose.datasets import DATASETS
 from xtcocotools.coco import COCO
 
@@ -25,7 +26,11 @@ class TestPoseDataset(TestBaseDataset):
                  num_queries=100,
                  num_episodes=1,
                  pck_threshold_list=[0.05, 0.1, 0.15, 0.20, 0.25],
-                 test_mode=True):
+                 test_mode=True,
+                 modify_texts=None,  # None is the default, animal_synonym tests text synonyms variations on animals
+                 test_subset=None,
+                 change_keypoints_names=True
+                 ):
         super().__init__(
             ann_file, img_prefix, data_cfg, pipeline, test_mode=test_mode, PCK_threshold_list=pck_threshold_list)
 
@@ -42,6 +47,10 @@ class TestPoseDataset(TestBaseDataset):
 
         self.id2name, self.name2id = self._get_mapping_id_name(self.coco.imgs)
         self.img_ids = self.coco.getImgIds()
+
+        # relevant_names = ['onager_face/onager_55.jpg', 'dog_body/000000010821.jpg', 'short_sleeved_shirt/055126.jpg']
+        # self.img_ids = [img_id for img_id in self.img_ids if self.id2name[img_id] in relevant_names]
+
         self.classes = [
             cat['name'] for cat in self.coco.loadCats(self.coco.getCatIds())
         ]
@@ -56,6 +65,10 @@ class TestPoseDataset(TestBaseDataset):
             self.valid_class_ids = self.coco.getCatIds()
 
         self.valid_classes = [self._ind_to_class[ind] for ind in self.valid_class_ids]
+
+        self.modify_texts = modify_texts
+        self.test_subset = test_subset
+        self.test_on_subset()
 
         self.cats = self.coco.cats
         self.max_kpt_num = max_kpt_num
@@ -73,10 +86,30 @@ class TestPoseDataset(TestBaseDataset):
             self.num_episodes = num_episodes
             self.make_paired_samples()
 
+        self.change_keypoints_names = change_keypoints_names
         self.get_points_names_tokens()
 
+
+    def test_on_subset(self):
+        subset_classes = self.valid_classes
+        if self.test_subset == "animal_body":
+            subset_classes = ['antelope_body', 'beaver_body', 'bison_body', 'bobcat_body', 'cat_body', 'cheetah_body',
+                                'cow_body', 'deer_body', 'dog_body', 'elephant_body', 'fox_body', 'giraffe_body',
+                                'gorilla_body', 'hamster_body', 'hippo_body', 'horse_body', 'leopard_body', 'lion_body',
+                                'otter_body', 'panda_body', 'panther_body', 'pig_body', 'polar_bear_body', 'rabbit_body',
+                                'raccoon_body', 'rat_body', 'rhino_body', 'sheep_body', 'skunk_body',
+                                'spider_monkey_body', 'squirrel_body', 'weasel_body', 'wolf_body', 'zebra_body']
+        elif self.test_subset == "human_body":
+            subset_classes = ["human_body"]
+        self.valid_classes = [item for item in self.valid_classes if item in subset_classes]
+        subset_indices = []
+        for cls in self.valid_classes:
+            subset_indices.append(self._class_to_ind[cls])
+        self.valid_class_ids = subset_indices
+
+
     def update_points_names(self, category):
-        updated_point_names = rename_points_descriptions(category)
+        updated_point_names = rename_points_descriptions(category, self.modify_texts)
         if len(updated_point_names) > 0:
             self.cats[category['id']]['keypoints'] = updated_point_names
 
@@ -85,7 +118,8 @@ class TestPoseDataset(TestBaseDataset):
         print("Tokenizing point names.")
         self.cats_points_descriptions = {}
         for category_id in self.cats.keys():
-            self.update_points_names(self.cats[category_id])
+            if self.change_keypoints_names:
+                self.update_points_names(self.cats[category_id])
             point_names = np.array(self.cats[category_id]['keypoints'])
 
             self.cats_points_descriptions[category_id] = point_names
@@ -113,6 +147,14 @@ class TestPoseDataset(TestBaseDataset):
         all_samples = []
         for cls in self.valid_class_ids:
             for _ in range(self.num_episodes):
+                # if self.cat2obj[cls] == []:
+                #     continue
+                # self.num_queries = 1
+                # self.num_shots = 1
+                # shots = self.cat2obj[cls]
+                # for query_id in shots:
+                #     all_samples.append([query_id] + [query_id])
+
                 shots = random.sample(self.cat2obj[cls], self.num_shots + self.num_queries)
                 sample_ids = shots[:self.num_shots]
                 query_ids = shots[self.num_shots:]

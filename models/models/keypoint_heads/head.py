@@ -69,9 +69,11 @@ class PoseHead(nn.Module):
                  share_kpt_branch=False,
                  num_decoder_layer=3,
                  with_heatmap_loss=False,
+                 # with_decoder_attention_loss=False,
                  with_bb_loss=False,
                  bb_temperature=0.2,
                  heatmap_loss_weight=2.0,
+                 # decoder_attention_loss_weight=0.2,
                  support_order_dropout=-1,
                  extra=None,
                  train_cfg=None,
@@ -85,9 +87,11 @@ class PoseHead(nn.Module):
         self.transformer = build_transformer(transformer)
         self.embed_dims = self.transformer.d_model
         self.with_heatmap_loss = with_heatmap_loss
+        # self.with_decoder_attention_loss = with_decoder_attention_loss
         self.with_bb_loss = with_bb_loss
         self.bb_temperature = bb_temperature
         self.heatmap_loss_weight = heatmap_loss_weight
+        # self.decoder_attention_loss_weight = decoder_attention_loss_weight
         self.support_order_dropout = support_order_dropout
 
         assert 'num_feats' in positional_encoding
@@ -177,7 +181,7 @@ class PoseHead(nn.Module):
                                                                                    masks_query,
                                                                                    self.positional_encoding,
                                                                                    self.kpt_branch,
-                                                                                   skeleton)
+                                                                                   skeleton, return_attn_map=True)
 
         output_kpts = []
         for idx in range(outs_dec.shape[0]):
@@ -206,6 +210,20 @@ class PoseHead(nn.Module):
             losses['heatmap_loss'] = self.heatmap_loss(
                 similarity_map, target_heatmap, target_weight,
                 normalizer) * self.heatmap_loss_weight
+
+        # if self.with_decoder_attention_loss:
+        #     # Stack attention maps along a new dimension
+        #     stacked_attentions = torch.stack(decoder_attn_maps, dim=0)
+        #
+        #     # Compute the mean attention map across the new dimension (dimension 0)
+        #     mean_attention = torch.mean(stacked_attentions, dim=0)
+        #
+        #     new_dim = int(mean_attention.shape[2] ** 0.5)
+        #     mean_attention = mean_attention.view(mean_attention.shape[0], mean_attention.shape[1], new_dim, new_dim)
+        #     losses['decoder_attention_loss'] = self.heatmap_loss(
+        #         mean_attention, target_heatmap, target_weight,
+        #         normalizer) * self.decoder_attention_loss_weight
+
 
         # compute l1 loss for inital_proposals
         proposal_l1_loss = F.l1_loss(

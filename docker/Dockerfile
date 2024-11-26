@@ -47,7 +47,8 @@ COPY train.py CapeX/
 COPY README.md CapeX/
 COPY run_me.sh CapeX/
 
-RUN mkdir -p CapeX/data/mp100
+# RUN mkdir -p CapeX/data/mp100
+RUN mkdir -p CapeX/data
 WORKDIR CapeX
 
 # Install MMPose
@@ -55,5 +56,10 @@ RUN conda clean --all
 ENV FORCE_CUDA="1"
 RUN python setup.py develop
 
+RUN ln -s /storage/matanru/capex/data/mp100 ./data/mp100
+#RUN ln -s /storage/matanru/capex/data/ap10k ./data/ap10k
+
+RUN ln -s /storage/matanru/capex/data/mp78_annotations_settingB ./data/mp78_annotations_settingB
+
 #CMD ["bash"]
-#CMD ["/bin/bash", "-c", "chmod +x run_me.sh && ./run_me.sh"]
+CMD ["/bin/bash", "-c", "chmod +x run_me.sh && ./run_me.sh"]

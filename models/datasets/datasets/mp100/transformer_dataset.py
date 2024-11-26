@@ -23,7 +23,8 @@ class TransformerPoseDataset(TransformerBaseDataset):
                  num_shots=1,
                  num_queries=100,
                  num_episodes=1,
-                 test_mode=False):
+                 test_mode=False,
+                 change_keypoints_names=True):
         super().__init__(
             ann_file, img_prefix, data_cfg, pipeline, test_mode=test_mode)
 
@@ -71,7 +72,10 @@ class TransformerPoseDataset(TransformerBaseDataset):
             self.num_episodes = num_episodes
             self.make_paired_samples()
 
+        self.change_keypoints_names = change_keypoints_names
         self.get_points_names_tokens()
+        self.support_points_fraction = data_cfg[
+            'support_points_fraction'] if 'support_points_fraction' in data_cfg else None
 
     def update_points_names(self, category):
         updated_point_names = rename_points_descriptions(category)
@@ -83,7 +87,8 @@ class TransformerPoseDataset(TransformerBaseDataset):
         self.cats_points_descriptions = {}
 
         for category_id in self.cats.keys():
-            self.update_points_names(self.cats[category_id])
+            if self.change_keypoints_names:
+                self.update_points_names(self.cats[category_id])
             point_names = np.array(self.cats[category_id]['keypoints'])
 
             self.cats_points_descriptions[category_id] = point_names

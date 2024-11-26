@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 
 import json_tricks as json
 import numpy as np
+import math
 from mmcv.parallel import DataContainer as DC
 from mmpose.core.evaluation.top_down_eval import (keypoint_pck_accuracy)
 from mmpose.datasets import DATASETS
@@ -136,9 +137,9 @@ class TransformerBaseDataset(Dataset, metaclass=ABCMeta):
         :return: Xall
         """
         Xall = dict()
-        # # Support images are ignored:
-        # Xall['img_s'] = [Xs['img'] for Xs in Xs_list]
-        Xall['img_s'] = [0 for Xs in Xs_list]
+
+        Xall['img_s'] = [Xs['img'] for Xs in Xs_list]
+        # Xall['img_s'] = [0 for Xs in Xs_list]
 
         Xall['target_s'] = [Xs['target'] for Xs in Xs_list]
         Xall['target_weight_s'] = [Xs['target_weight'] for Xs in Xs_list]
@@ -184,6 +185,23 @@ class TransformerBaseDataset(Dataset, metaclass=ABCMeta):
         for sample_obj in sample_obj_list:
             Xs = self.pipeline(sample_obj)  # dict with ['img', 'target', 'target_weight', 'img_metas'],
             Xs['img_metas'].data['point_descriptions'] = self.cats_points_descriptions[Xs['img_metas'].data['category_id']]
+            Xs['target'] = np.zeros_like(Xs['target'])  # there is no need in the gaussian target around the points in the support images
+            Xs['img'] = 0  # there is no need in the support image
+            if self.support_points_fraction is not None:
+                # randomly mask out some of the points in the support set
+                Xs['target_weight'] = np.zeros_like(Xs['target_weight'])
+                Xs['target_weight'][:len(Xs['img_metas'].data['point_descriptions'])] = 1
+                Xs['img_metas'].data['joints_3d_visible'][:len(Xs['img_metas'].data['point_descriptions']), :] = [1., 1., 0.]
+
+                if not (0.0 <= self.support_points_fraction <= 1.0):
+                    raise ValueError("self.support_points_fraction must be in the range [0.0, 1.0]")
+
+                num_dropped_points = math.ceil(len(Xs['img_metas'].data['point_descriptions']) * (1 - self.support_points_fraction))  # Calculate the number of values to set to zero
+                indices_to_zero = np.random.choice(len(Xs['img_metas'].data['point_descriptions']), size=num_dropped_points,
+                                                   replace=False)  # Randomly select num_dropped_points indices within the legitimate points
+                Xs['target_weight'][indices_to_zero] = 0  # Set those selected indices to zero
+                Xs['img_metas'].data['joints_3d_visible'][:len(Xs['img_metas'].data['point_descriptions']), :] = [0., 0., 0.]
+
             Xs_list.append(Xs)  # Xs['target'] is of shape [100, map_h, map_w]
         Xq = self.pipeline(query_obj)
         Xq['img_metas'].data['point_descriptions'] = self.cats_points_descriptions[Xq['img_metas'].data['category_id']]

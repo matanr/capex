@@ -46,17 +46,17 @@ channel_cfg = dict(
 
 # model settings
 model = dict(
-    type='PoseAnythingModel',
-    pretrained='pretrained/swinv2_small_1k_500k.pth',
+    type='CapeXModel',
+    pretrained='pretrained/swinv2_tiny_patch4_window16_256.pth',
     text_pretrained='Alibaba-NLP/gte-base-en-v1.5',
     finetune_text_pretrained=False,
     encoder_config=dict(
         type='SwinTransformerV2',
         embed_dim=96,
-        depths=[2, 2, 18, 2],
+        depths=[2, 2, 6, 2],
         num_heads=[3, 6, 12, 24],
         window_size=16,
-        drop_path_rate=0.3,
+        drop_path_rate=0.2,
         img_size=256,
         upsample="bilinear"
     ),
@@ -80,7 +80,7 @@ model = dict(
         share_kpt_branch=False,
         num_decoder_layer=3,
         with_heatmap_loss=True,
-        
+
         heatmap_loss_weight=2.0,
         support_order_dropout=-1,
         positional_encoding=dict(
@@ -92,6 +92,7 @@ model = dict(
         post_process='default',
         shift_heatmap=True,
         modulate_kernel=11))
+
 
 data_cfg = dict(
     image_size=[256, 256],
@@ -145,13 +146,16 @@ test_pipeline = valid_pipeline
 
 data_root = 'data/mp100'
 data = dict(
+    # samples_per_gpu=16,
+    # workers_per_gpu=16,
+    # samples_per_gpu=45,
     samples_per_gpu=16,
     workers_per_gpu=16,
     # samples_per_gpu=8,
     # workers_per_gpu=8,
     train=dict(
         type='TransformerPoseDataset',
-        ann_file=f'{data_root}/annotations/mp100_split3_train.json',
+        ann_file=f'{data_root}/annotations/mp100_split2_train.json',
         img_prefix=f'{data_root}/images/',
         # img_prefix=f'{data_root}',
         data_cfg=data_cfg,
@@ -161,7 +165,7 @@ data = dict(
         pipeline=train_pipeline),
     val=dict(
         type='TransformerPoseDataset',
-        ann_file=f'{data_root}/annotations/mp100_split3_val.json',
+        ann_file=f'{data_root}/annotations/mp100_split2_val.json',
         img_prefix=f'{data_root}/images/',
         # img_prefix=f'{data_root}',
         data_cfg=data_cfg,
@@ -173,7 +177,7 @@ data = dict(
         pipeline=valid_pipeline),
     test=dict(
         type='TestPoseDataset',
-        ann_file=f'{data_root}/annotations/mp100_split3_test.json',
+        ann_file=f'{data_root}/annotations/mp100_split2_test.json',
         img_prefix=f'{data_root}/images/',
         # img_prefix=f'{data_root}',
         data_cfg=data_cfg,

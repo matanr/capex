@@ -46,7 +46,7 @@ channel_cfg = dict(
 
 # model settings
 model = dict(
-    type='PoseAnythingModel',
+    type='CapeXModel',
     pretrained='pretrained/swinv2_small_1k_500k.pth',
     text_pretrained="ViT-B/32",
     finetune_text_pretrained=False,

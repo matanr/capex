@@ -46,7 +46,7 @@ channel_cfg = dict(
 
 # model settings
 model = dict(
-    type='PoseAnythingModel',
+    type='CapeXModel',
     pretrained='pretrained/swinv2_small_1k_500k.pth',
     text_pretrained='Alibaba-NLP/gte-base-en-v1.5',
     finetune_text_pretrained=False,

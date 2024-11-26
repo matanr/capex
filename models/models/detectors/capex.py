@@ -14,8 +14,17 @@ from transformers import AutoModel, AutoTokenizer
 from transformers import BertTokenizer, BertModel
 import random
 
+
+def get_fully_connected_graph(visible_points):
+    from itertools import combinations
+    nodes = np.where((visible_points == np.array([1., 1., 0.])).all(axis=1))[0]
+    edges = list(combinations(nodes, 2))
+    edges = [[e1, e2] for e1, e2 in edges]
+    return edges
+
+
 @POSENETS.register_module()
-class PoseAnythingModel(BasePose):
+class CapeXModel(BasePose):
     """Few-shot keypoint detectors.
     Args:
         keypoint_head (dict): Keypoint head to process feature.
@@ -195,7 +204,7 @@ class PoseAnythingModel(BasePose):
         batch_size, _, img_height, img_width = img_q.shape
 
         # # masking the query image
-        # patch_size = 128
+        # patch_size = 192
         # patch_location = (
         #     random.randint(0, img_height - patch_size),
         #     random.randint(0, img_width - patch_size))
@@ -205,6 +214,19 @@ class PoseAnythingModel(BasePose):
         # # img_s[0] = img_s[0] * mask
         # img_q = img_q * mask
 
+        # try fully connected graph:
+        # skeleton = get_fully_connected_graph(img_metas[0]['query_joints_3d_visible'])
+        # try empty graph:
+        # skeleton = [[0,0]]
+        # img_metas[0]['query_skeleton'] = skeleton
+        # img_metas[0]['sample_skeleton'] = [skeleton]
+
+        # try custom graph, from chatgpt:
+        # from ...datasets.datasets.mp100.utils import get_custom_graph_from_llm
+        # skeleton = get_custom_graph_from_llm(img_metas)
+        # img_metas[0]['query_skeleton'] = skeleton
+        # img_metas[0]['sample_skeleton'] = [skeleton]
+
         output, initial_proposals, similarity_map, _ = self.predict(img_s, target_s, target_weight_s, img_q, img_metas)
         predicted_pose = output[-1].detach().cpu().numpy()  # [bs, num_query, 2]
 
@@ -213,9 +235,15 @@ class PoseAnythingModel(BasePose):
             keypoint_result = self.keypoint_head.decode(img_metas, predicted_pose, img_size=[img_width, img_height])
             result.update(keypoint_result)
 
+        # for b in range(output.shape[1]):
+        #     result.update({
+        #         "points":
+        #             torch.cat((initial_proposals[b][None], output[:,b,:,:])).cpu().numpy()
+        #     })
         result.update({
             "points":
                 torch.cat((initial_proposals, output.squeeze(1))).cpu().numpy()
+                # torch.cat((initial_proposals.unsqueeze(1), output.transpose(0, 1)), dim=1).cpu().numpy()
         })
         result.update({"sample_image_file": img_metas[0]['sample_image_file']})
 
@@ -300,6 +328,7 @@ class PoseAnythingModel(BasePose):
                     # # pad all unused points with 0, up to max_points (default is 100)
                     padded_tensor = torch.zeros(max_points, all_descriptions.shape[-1]).to(device=self.text_backbone_device).detach()
                     padded_tensor[mask_s[i].view(-1) == 1] = all_descriptions[start_index:end_index]
+                    # padded_tensor[:len(description)] = all_descriptions[start_index:end_index]
 
                     batch_padded_tensors.append(padded_tensor)
                     start_index = end_index
