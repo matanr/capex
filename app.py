@@ -132,7 +132,7 @@ COLORS = [
 
 
 def process(query_img, node_descriptions, edges, state,
-            cfg_path='configs/1shot-swin-gte/graph_split1_config.py'):
+            cfg_path='configs/tiny/tiny_split1_config.py'):
     node_descriptions = descriptions_prompt_to_list(node_descriptions)
     edges = edges_prompt_to_list(edges)
     state['point_descriptions'] = node_descriptions
@@ -344,7 +344,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='CapeX Demo')
     parser.add_argument('--checkpoint',
                         help='checkpoint path',
-                        default='./swin-gte-split1.pth')
+                        default='./capex-split1.pth')
     args = parser.parse_args()
     checkpoint_path = args.checkpoint
     demo.launch()
