@@ -1,4 +1,4 @@
-# CapeX: Category-Agnostic Pose Estimation from Textual Point Explanation
+# CapeX: Category-Agnostic Pose Estimation from Textual Point Explanation [ICLR 2025]
 
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/capex-category-agnostic-pose-estimation-from/2d-pose-estimation-on-mp-100)](https://paperswithcode.com/sota/2d-pose-estimation-on-mp-100?p=capex-category-agnostic-pose-estimation-from)
 <a href="https://arxiv.org/pdf/2406.00384"><img src="https://img.shields.io/badge/arXiv-2311.17891-b31b1b.svg"></a>
