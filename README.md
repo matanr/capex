@@ -23,13 +23,13 @@ Our approach effectively breaks symmetry, preserves structure, and improves occl
 ## Citation
 If you find this useful, please cite this work as follows:
 ```bibtex
-@misc{rusanovsky2024capex,
-      title={CapeX: Category-Agnostic Pose Estimation from Textual Point Explanation}, 
-      author={Matan Rusanovsky and Or Hirschorn and Shai Avidan},
-      year={2024},
-      eprint={2406.00384},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV}
+@inproceedings{
+rusanovsky2025capex,
+title={CapeX: Category-Agnostic Pose Estimation from Textual Point Explanation},
+author={Matan Rusanovsky and Or Hirschorn and Shai Avidan},
+booktitle={The Thirteenth International Conference on Learning Representations},
+year={2025},
+url={https://openreview.net/forum?id=scKAXgonmq}
 }
 ```
 
